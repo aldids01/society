@@ -2,6 +2,8 @@
 
 This is a Society Microfinance Loan Management  Laravel Filament application.
 
+This web based application is hosted and running at https://apps.gechaan.com
+
 ## Members Features
 - Loan Request
 - Grain Request
