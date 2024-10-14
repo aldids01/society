@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SavingResource\Pages;
 use App\Filament\Resources\SavingResource\RelationManagers;
 use App\Models\Saving;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,12 +16,23 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class SavingResource extends Resource
+class SavingResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Saving::class;
 
     protected static ?string $navigationIcon = 'heroicon-m-calculator';
     protected static ?string $navigationGroup = 'Finance';
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+        ];
+    }
 
     public static function form(Form $form): Form
     {

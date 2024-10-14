@@ -4,6 +4,7 @@ namespace App\Filament\Widget;
 
 use App\Filament\Exports\ApplicantExporter;
 use App\Models\Applicant;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Actions\ExportAction;
 use Filament\Pages\Page;
@@ -15,7 +16,7 @@ use Filament\Tables\Table;
 
 class DeductionSchedule extends Page implements HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithTable, HasPageShield;
     protected static ?string $model = Applicant::class;
     protected static ?string $navigationGroup = 'Finance';
     protected static ?string $navigationIcon = 'heroicon-o-document-text';

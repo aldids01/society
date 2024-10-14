@@ -5,7 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ApplicantResource\Pages;
 use App\Filament\Resources\ApplicantResource\RelationManagers;
 use App\Models\Applicant;
+use App\Models\GrainAmort;
+use App\Models\LoanAmort;
+use App\Models\Saving;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -130,6 +134,7 @@ class ApplicantResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make(),
                 SelectFilter::make('status')
                     ->options([
                         'active' => 'Active',
@@ -143,6 +148,68 @@ class ApplicantResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->visible(fn($record) => $record->trashed()), // Visible only for trashed records
+
+                    Tables\Actions\RestoreAction::make()
+                        ->visible(fn($record) => $record->trashed()),
+                    Tables\Actions\Action::make('withdrawal')
+                        ->label('Withdraw Applicant')
+                        ->requiresConfirmation()
+                        ->modalHeading(fn($record) => 'Withdraw for ' . $record->name)
+                        ->form(function ($record) {
+                            return [
+                                TextInput::make('savesing')
+                                    ->label('Total Saving')
+                                    ->default(fn() =>Saving::where('applicant_id', $record->staff_id)->sum('total'))
+                                    ->numeric()
+                                    ->prefix('NGN')
+                                    ->readOnly()
+                                    ->required(),
+                                TextInput::make('loan')
+                                    ->label('Loan Balance')
+                                    ->default(fn() =>LoanAmort::where('loan_owner', $record->staff_id)->where('status', '=', 'pending')->sum('principal'))
+                                    ->numeric()
+                                    ->prefix('NGN')
+                                    ->readOnly(),
+                                TextInput::make('grain')
+                                    ->label('Grain Balance')
+                                    ->default(fn() => GrainAmort::where('grain_owner', $record->staff_id)->where('status', '=', 'pending')->sum('principal'))
+                                    ->numeric()
+                                    ->prefix('NGN')
+                                    ->readOnly(),
+                                TextInput::make('pay')
+                                    ->label('Pay Off')
+                                    ->default(function () use ($record) {
+                                        $savesing = Saving::where('applicant_id', $record->staff_id)->sum('total');
+                                        $loan = LoanAmort::where('loan_owner', $record->staff_id)->where('status', '=', 'pending')->sum('principal');
+                                        $grain = GrainAmort::where('grain_owner', $record->staff_id)->where('status', '=', 'pending')->sum('principal');
+
+                                        return $savesing - ($loan + $grain);
+                                    })
+                                    ->numeric()
+                                    ->prefix('NGN')
+                                    ->readOnly(),
+
+                            ];
+                        })
+                        ->action(function ($record, array $data) {
+                            LoanAmort::where('loan_owner', $record->staff_id)->where('status', '=', 'pending')->delete();
+                            GrainAmort::where('grain_owner', $record->staff_id)->where('status', '=', 'pending')->delete();
+                            Saving::where('applicant_id', $record->staff_id)->delete();
+
+                            $paid = $data['savesing'] - ($data['loan'] + $data['grain']);
+
+                            Saving::create([
+                                'applicant_id' => $record->staff_id,
+                                'annual' => date('Y'),
+                                date('F') => $paid,
+                            ]);
+                        })
+                        ->icon('heroicon-m-banknotes')
+                        ->visible(fn($record)=>$record->status === 'active')
+                        ->slideOver(),
                 ]),
             ])
             ->bulkActions([

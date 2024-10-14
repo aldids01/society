@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
@@ -24,12 +25,23 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\GrainAmortResource\Pages;
 use App\Filament\Resources\GrainAmortResource\RelationManagers;
 
-class GrainAmortResource extends Resource
+class GrainAmortResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = GrainAmort::class;
     protected static ?string $modelLabel = 'Grain Schedules';
     protected static ?string $navigationIcon = 'heroicon-m-presentation-chart-bar';
     protected static ?string $navigationGroup = 'Finance';
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+        ];
+    }
     public $totalSavings;
 
     public function mount($record)

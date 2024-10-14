@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
@@ -18,14 +19,27 @@ use App\Filament\Resources\ApprovedLoanResource\RelationManagers;
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
 
-class ApprovedLoanResource extends Resource
+class ApprovedLoanResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = ApprovedLoan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Approvals';
     protected static ?string $modalLabel = 'Loan Approvals';
-
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+            'checked',
+            'disbursed',
+            'approve',
+        ];
+    }
     public static function form(Form $form): Form
     {
         return $form
@@ -105,7 +119,7 @@ class ApprovedLoanResource extends Resource
                         ->label('View Loan'),
                     Tables\Actions\EditAction::make()
                         ->visible(fn($record)=>$record->loan->status === 'pending'),
-                    Tables\Actions\Action::make('Disbursed')
+                    Tables\Actions\Action::make('disbursed')
                             ->label('Disbursed')
                             ->action(function ($record) {
                                 $record->loan->update(['status' => 'disbursed']);

@@ -91,6 +91,24 @@ class GuarantorResource extends Resource
                 Tables\Actions\ViewAction::make()
                         ->url(fn ($record) => url("/member/loans/{$record->loan->id}"))
                         ->label('View Loan'),
+                Tables\Actions\Action::make('approve')
+                    ->label('Approve')
+                    ->action(function ($record) {
+                        $record->update(['guarantor_status' => 'approved']);
+                    })
+                    ->requiresConfirmation()
+                    ->color('success')
+                    ->icon('heroicon-s-check')
+                    ->visible(fn($record)=>$record->guarantor_status === 'pending'),
+                Tables\Actions\Action::make('reject')
+                    ->label('Reject')
+                    ->action(function ($record) {
+                        $record->update(['guarantor_status' => 'rejected']);
+                    })
+                    ->requiresConfirmation()
+                    ->color('danger')
+                    ->icon('heroicon-s-x-circle')
+                    ->visible(fn($record)=>$record->guarantor_status === 'pending'),
                 // Tables\Actions\EditAction::make(),
                 // Tables\Actions\DeleteAction::make(),
             ])

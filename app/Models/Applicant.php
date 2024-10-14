@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Applicant extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $guarded = [];
     public function user():BelongsTo
     {
@@ -34,4 +35,6 @@ class Applicant extends Model
     {
         return $this->hasMany(GrainAmort::class, 'grain_owner', 'staff_id');
     }
+
+    protected array $dates = ['deleted_at'];
 }

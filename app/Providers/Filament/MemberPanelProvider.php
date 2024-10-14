@@ -4,13 +4,9 @@ namespace App\Providers\Filament;
 
 use Filament\Pages;
 use Filament\Panel;
-use Filament\Widgets;
 use Filament\PanelProvider;
-use Filament\Pages\Dashboard;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
 use Filament\Support\Enums\MaxWidth;
-use Filament\Navigation\NavigationItem;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;

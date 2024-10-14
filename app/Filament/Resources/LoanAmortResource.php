@@ -7,6 +7,7 @@ use App\Filament\Resources\LoanAmortResource\RelationManagers;
 use App\Models\Applicant;
 use App\Models\LoanAmort;
 use App\Models\Saving;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
@@ -24,12 +25,23 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
-class LoanAmortResource extends Resource
+class LoanAmortResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = LoanAmort::class;
     protected static ?string $modelLabel = 'Loan Schedules';
     protected static ?string $navigationIcon = 'heroicon-m-presentation-chart-line';
     protected static ?string $navigationGroup = 'Finance';
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+        ];
+    }
     public $totalSavings;
 
     public function mount($record)
@@ -118,8 +130,17 @@ class LoanAmortResource extends Resource
                     Tables\Actions\Action::make('shift')
                         ->label('Shift Loan')
                         ->requiresConfirmation()
+                        ->modalHeading(fn($record) => 'Shift Loan for ' . $record->applicant->name)
                         ->icon('heroicon-m-pencil-square')
-                        ->form([
+                        ->form(function ($record) {
+                            $pendingCount = LoanAmort::where('status', 'pending')->where('loan_id', '=', $record->loan->slug)->count();
+                            return[
+                            TextInput::make('terms')
+                                ->label('Terms')
+                                ->default($pendingCount)
+                                ->numeric()
+                                ->readOnly()
+                                ->required(),
                             DatePicker::make('start_date')
                                 ->native(false)
                                 ->displayFormat('jS F Y')
@@ -127,7 +148,8 @@ class LoanAmortResource extends Resource
                                 ->required()
                                 ->locale('us')
                                 ->label('Next Payment Start from')
-                        ])
+                            ];
+                        })
                         ->action(function ($record, array $data) {
                             LoanAmort::where('loan_id', $record->loan_id)->where('status', 'pending')->delete();
                             LoanAmort::create([
@@ -144,7 +166,7 @@ class LoanAmortResource extends Resource
 
                             $startDate = Carbon::parse($data['start_date']);
                             $startBalance = $record->start_balance;
-                            $terms = $record->loan->terms;
+                            $terms = $data['terms'];
                             $rate = $record->loan->rate / 100 / 12;
                             $payment = $startBalance * ($rate / (1 - pow(1 + $rate, -$terms)));
 
@@ -174,9 +196,17 @@ class LoanAmortResource extends Resource
                     Tables\Actions\Action::make('payment')
                         ->label('Extra Payment')
                         ->requiresConfirmation()
+                        ->modalHeading(fn($record) => 'Extra Payment for ' . $record->applicant->name)
                         ->icon('heroicon-m-credit-card')
                         ->form(function ($record) {
+                            $pendingCount = LoanAmort::where('status', 'pending')->where('loan_id', '=', $record->loan->slug)->count();
                             return [
+                                TextInput::make('terms')
+                                    ->label('Terms')
+                                    ->default($pendingCount)
+                                    ->numeric()
+                                    ->readOnly()
+                                    ->required(),
                                 TextInput::make('start_balance')
                                     ->label('Loan Balance')
                                     ->placeholder('Loan Balance')
@@ -216,7 +246,7 @@ class LoanAmortResource extends Resource
 
                             $startDate = Carbon::parse($data['start_date']);
                             $startBalance = $paid_bal;
-                            $terms = $record->loan->terms;
+                            $terms = $data['terms'];
                             $rate = $record->loan->rate / 100 / 12;
                             $payment = $startBalance * ($rate / (1 - pow(1 + $rate, -$terms)));
 
@@ -246,6 +276,7 @@ class LoanAmortResource extends Resource
                     Tables\Actions\Action::make('stop')
                         ->label('Stop Loan')
                         ->requiresConfirmation()
+                        ->modalHeading(fn($record) => 'Stop Loan for ' . $record->applicant->name)
                         ->action(function($record){
                             LoanAmort::where('loan_id', $record->loan_id)->where('status', 'pending')->delete();
                         })
@@ -325,6 +356,7 @@ class LoanAmortResource extends Resource
                     Tables\Actions\Action::make('transfer')
                         ->label('Transfer Loan')
                         ->requiresConfirmation()
+                        ->modalHeading(fn($record) => 'Transfer Loan for ' . $record->applicant->name)
                         ->form([
                             Select::make('applicant')
                                 ->options(Applicant::query()->where('status', 'active')->pluck('name', 'staff_id')->toArray())

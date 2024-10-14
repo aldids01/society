@@ -10,7 +10,7 @@ class ApprovedGrain extends Model
 {
     use HasFactory;
     protected $guarded = [];
-    public function loan() : BelongsTo {
+    public function grain() : BelongsTo {
         return $this->belongsTo(Grain::class, 'grain_id', 'slug');
     }
     public function approve() : BelongsTo {
