@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Loans;
 
 use App\Filament\Resources\Loans\Pages\ManageLoans;
+use App\Models\Guarantor;
 use App\Models\Loan;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -175,7 +176,20 @@ class LoanResource extends Resource
                         TextEntry::make('start_balance') ->numeric()->alignEnd(),
                         TextEntry::make('end_balance') ->numeric()->alignEnd(),
                         TextEntry::make('status')->badge()->alignCenter()->formatStateUsing(fn ($state) => ucfirst($state)),
+                    ]),
+                RepeatableEntry::make('guarantors')
+                    ->placeholder('This loan does not require a guarantor.')
+                    ->table([
+                        TableColumn::make('Name')
+                            ->width('70%'),
+                        TableColumn::make('Amount')
+                            ->width('30%')
+                            ->alignEnd(),
                     ])
+                    ->schema([
+                        TextEntry::make('member.name') ->alignStart(),
+                        TextEntry::make('amount') ->numeric()->alignEnd(),
+                    ]),
             ])->columns(1);
     }
 

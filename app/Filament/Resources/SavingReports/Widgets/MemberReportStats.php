@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SavingReports\Widgets;
 
 use App\Filament\Resources\SavingReports\Pages\ManageSavingReports;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -10,10 +11,17 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class MemberReportStats extends StatsOverviewWidget
 {
     use InteractsWithPageTable;
+    use HasPageShield;
     protected ?string $pollingInterval = null;
     protected function getTablePage(): string
     {
         return ManageSavingReports::class;
+    }
+    public static function canView(): bool
+    {
+        $user = auth()->user();
+
+        return $user->hasRole('super_admin');
     }
     protected function getStats(): array
     {
@@ -31,5 +39,9 @@ class MemberReportStats extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-m-user-minus')
                 ->color('danger'),
         ];
+    }
+    public function getColumnSpan(): int | string | array
+    {
+        return 2;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\LoanAmorts;
 
 use App\Filament\Resources\LoanAmorts\Pages\ManageLoanAmorts;
 use App\Filament\Resources\LoanAmorts\Widgets\LoanReportStats;
+use App\Filament\Resources\Loans\LoanResource;
 use App\Models\LoanAmort;
 use App\Models\Member;
 use App\Models\Saving;

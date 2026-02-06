@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SavingWithdrawals;
 
+use App\Filament\Resources\Loans\LoanResource;
 use App\Filament\Resources\SavingWithdrawals\Pages\ManageSavingWithdrawals;
 use App\Models\Loan;
 use BackedEnum;
@@ -90,56 +91,6 @@ class SavingWithdrawalResource extends Resource
             ])->columns(1);
     }
 
-    public static function infolist(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                TextEntry::make('saved')
-                    ->hiddenLabel()
-                    ->prefix('Amount Saved NGN ')
-                    ->alignEnd()
-                    ->inlineLabel()
-                    ->numeric(),
-                FusedGroup::make([
-                    TextEntry::make('rate')
-                        ->inlineLabel()
-                        ->prefix('%'),
-                    TextEntry::make('amount')
-                        ->numeric()
-                        ->inlineLabel()
-                        ->prefix('NGN'),
-                ])->columns(2),
-                FusedGroup::make([
-                    TextEntry::make('terms')->inlineLabel()->suffix(' Month(s)'),
-                    TextEntry::make('start_date')
-                        ->inlineLabel()
-                        ->date('jS F, Y'),
-                ])->columns(2),
-                RepeatableEntry::make('loanAmorts')
-                    ->hiddenLabel()
-                    ->table([
-                        TableColumn::make('Annual'),
-                        TableColumn::make('Period'),
-                        TableColumn::make('Interest')->alignEnd(),
-                        TableColumn::make('Principal')->alignEnd(),
-                        TableColumn::make('Payment')->alignEnd(),
-                        TableColumn::make('Start')->alignEnd(),
-                        TableColumn::make('End')->alignEnd(),
-                        TableColumn::make('Status')->alignCenter(),
-                    ])
-                    ->schema([
-                        TextEntry::make('annual') ->alignStart(),
-                        TextEntry::make('period') ->alignStart(),
-                        TextEntry::make('interest') ->numeric()->alignEnd(),
-                        TextEntry::make('principal') ->numeric()->alignEnd(),
-                        TextEntry::make('payment') ->numeric()->alignEnd(),
-                        TextEntry::make('start_balance') ->numeric()->alignEnd(),
-                        TextEntry::make('end_balance') ->numeric()->alignEnd(),
-                        TextEntry::make('status')->badge()->alignCenter()->formatStateUsing(fn ($state) => ucfirst($state)),
-                    ])
-            ]);
-    }
-
     public static function table(Table $table): Table
     {
         return $table
@@ -162,6 +113,7 @@ class SavingWithdrawalResource extends Resource
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->formatStateUsing(fn ($state) => ucfirst($state))
                     ->badge(),
                 TextColumn::make('start_date')
                     ->date('F, Y')
@@ -182,8 +134,10 @@ class SavingWithdrawalResource extends Resource
             ->filters([
                 TrashedFilter::make(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->recordActions([
                 ViewAction::make()
+                    ->schema(fn($schema) => LoanResource::infolist($schema))
                     ->slideOver(),
                 DeleteAction::make()
                     ->visible(fn ($record) => $record->status == 'pending'),

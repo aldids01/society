@@ -1,0 +1,66 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../vendor/jeffgreco13/filament-breezy/resources/**/*';
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+.fi-topbar{
+    @apply bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white;
+    backdrop-filter: blur(50px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);;
+}
+.fi-logo{
+    background: linear-gradient(135deg, #0334f8 0%, #8b5cf6 50%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.fi-sidebar{
+    @apply bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white;
+    backdrop-filter: blur(50px);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.fi-sidebar-group-label{
+    @apply text-blue-400  dark:text-white ;
+}
+.fi-sidebar-item-btn{
+    /*background: rgba(255, 255, 255, 0.1);*/
+    .fi-sidebar-item-icon {
+        @apply text-white;
+    }
+}
+
+.fi-sidebar-item-btn:hover{
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+}
+/* Specifically target the label text and the icon inside the button on hover */
+.fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+.fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
+    @apply text-blue-600 dark:text-white; /* This is a vibrant blue */
+}
+.fi-sidebar-item{
+    &.fi-active{
+        &>.fi-sidebar-item-btn{
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+            .fi-sidebar-item-label{
+                @apply text-blue-600 dark:text-white;
+            }
+            .fi-sidebar-item-icon {
+                @apply text-blue-600 dark:text-white;
+            }
+        }
+    }
+}
+.fi-sidebar-item-label{
+    @apply via-blue-400 text-white;
+}
+h1.fi-header-heading{
+    @apply text-blue-500;
+}
+
+/*.fi-icon{*/
+/*    @apply text-blue-500;*/
+/*}*/
+/*div.text-primary-500{*/
+/*    @apply text-blue-500;*/
+/*}*/

@@ -10,10 +10,12 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class MemberStats extends StatsOverviewWidget
 {
     use InteractsWithPageTable;
+    protected bool $hasDeferredFilters = true;
     protected function getTablePage(): string
     {
         return ManageMembers::class;
     }
+    protected static ?int $sort = 1;
     protected function getStats(): array
     {
         return [
