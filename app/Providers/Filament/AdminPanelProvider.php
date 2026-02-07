@@ -33,6 +33,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
+use Rupadana\ApiService\ApiServicePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -41,7 +42,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('/')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->profile(isSimple: false)
@@ -125,9 +126,9 @@ class AdminPanelProvider extends PanelProvider
                         'sm' => 2,
                     ]),
                 FilamentDbSync::make(),
+                ApiServicePlugin::make(),
                 BreezyCore::make()
                     ->enableBrowserSessions(condition: true)
-                    ->enableSanctumTokens()
                     ->myProfile(
                         // Sets the 'account' link in the panel User Menu (default = true)
                         shouldRegisterNavigation: true, // Customizes the 'account' link label in the panel User Menu (default = null)

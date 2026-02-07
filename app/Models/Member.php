@@ -2,20 +2,54 @@
 
 namespace App\Models;
 
+use Database\Factories\MemberFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Rupadana\ApiService\Contracts\HasAllowedFields;
+use Rupadana\ApiService\Contracts\HasAllowedFilters;
+use Rupadana\ApiService\Contracts\HasAllowedSorts;
 
-class Member extends Model
+class Member extends Model implements HasAllowedFields, HasAllowedSorts, HasAllowedFilters
 {
-    /** @use HasFactory<\Database\Factories\MemberFactory> */
+    /** @use HasFactory<MemberFactory> */
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
+// Which fields can be selected from the database through the query string
+    public static function getAllowedFields(): array
+    {
+        return [
+            'slug',
+            'name',
+            'gender',
+            'phone',
+            'kin_name',
+            'kin_phone',
+            'saving',
+            'status'
+        ];
+    }
 
+    // Which fields can be used to sort the results through the query string
+    public static function getAllowedSorts(): array
+    {
+        return [
+            'name'
+        ];
+    }
+
+    // Which fields can be used to filter the results through the query string
+    public static function getAllowedFilters(): array
+    {
+       return [
+           'slug',
+           'name',
+       ];
+    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
