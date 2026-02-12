@@ -151,6 +151,7 @@ class GrainAmortResource extends Resource
                 SelectFilter::make('member_id')
                     ->label('Member')
                     ->searchable()
+                    ->visible(auth()->user()->hasRole('super_admin'))
                     ->options(fn (): array => Member::query()->where('status', '=', 'active')->pluck('name', 'slug')->all())
 
             ], layout: FiltersLayout::AboveContent)
@@ -235,7 +236,7 @@ class GrainAmortResource extends Resource
                                 $remainingBalance = $endBalance;
                             }
                         })
-                        ->visible(fn($record) => $record->status !== 'paid' )
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin'))
                         ->slideOver(),
                     Action::make('payment')
                         ->label('Extra Payment')
@@ -323,7 +324,7 @@ class GrainAmortResource extends Resource
                             }
                         })
                         ->
-                        visible(fn($record) => $record->status !== 'paid' )
+                        visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin'))
                         ->slideOver(),
                     Action::make('stop')
                         ->label('Stop Grain')
@@ -335,7 +336,7 @@ class GrainAmortResource extends Resource
                         })
                         ->icon('heroicon-m-x-mark')
                         ->modalIcon('heroicon-m-x-mark')
-                        ->visible(fn($record) => $record->status !== 'paid' ),
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin')),
                     Action::make('savings')
                         ->label('Saving Payout')
                         ->requiresConfirmation()
@@ -444,7 +445,7 @@ class GrainAmortResource extends Resource
                         ->icon('heroicon-m-banknotes')
                         ->modalIcon('heroicon-m-banknotes')
                         ->modalDescription('Saving Payout are using your total saving to reduce or pay off your pending loan. Are you sure you want to do this?')
-                        ->visible(fn($record) => $record->status !== 'paid' )
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin'))
                         ->slideOver(),
                     Action::make('transfer')
                         ->label('Transfer Grain')
@@ -476,7 +477,7 @@ class GrainAmortResource extends Resource
                         })
                         ->icon('heroicon-m-arrow-right-circle')
                         ->modalIcon('heroicon-m-arrow-right-circle')
-                        ->visible(fn($record) => $record->status !== 'paid' )
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin'))
                         ->slideOver(),
                 ])->button()->size(Size::Small)
             ])
@@ -490,6 +491,7 @@ class GrainAmortResource extends Resource
                         ->modalIcon('heroicon-s-check-badge')
                         ->modal()
                         ->color('success')
+                        ->visible(auth()->user()->hasRole('super_admin'))
                         ->modalDescription('Are you sure you want to do this?')
                         ->modalFooterActionsAlignment(Alignment::Center)
                         ->modalWidth(Width::ExtraSmall)
@@ -513,6 +515,7 @@ class GrainAmortResource extends Resource
                         ->modal()
                         ->modalFooterActionsAlignment(Alignment::Center)
                         ->color('primary')
+                        ->visible(auth()->user()->hasRole('super_admin'))
                         ->modalDescription('Are you sure you want to do this?')
                         ->modalCancelAction(false)
                         ->label('Mark as Pending')
@@ -534,6 +537,7 @@ class GrainAmortResource extends Resource
                         ->modal()
                         ->modalFooterActionsAlignment(Alignment::Center)
                         ->color('danger')
+                        ->visible(auth()->user()->hasRole('super_admin'))
                         ->modalCancelAction(false)
                         ->label('Mark as Overdue')
                         ->modalDescription('Are you sure you want to do this?')
@@ -559,11 +563,19 @@ class GrainAmortResource extends Resource
         ];
     }
 
-    public static function getRecordRouteBindingEloquentQuery(): Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+
+        if (auth()->user()->hasRole('Member')) {
+            $memberSlug = auth()->user()->member->slug;
+
+            return $query->where('member_id', $memberSlug);
+        }
+
+        return $query;
     }
 }

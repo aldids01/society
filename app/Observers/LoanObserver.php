@@ -6,7 +6,10 @@ use App\Models\Loan;
 use App\Models\LoanAmort;
 use App\Models\LoanApproval;
 use App\Models\Saving;
+use App\Models\User;
 use Carbon\Carbon;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 
 class LoanObserver
@@ -84,6 +87,30 @@ class LoanObserver
                 $this->createMonthlyEntries($loan, $amount, $terms, $totalInterest, $monthlyPayment, $startDate);
             }
         });
+
+        $user = $loan->member->user;
+        Notification::make()
+            ->title('Loan Request Successful')
+            ->body("{$loan->member->name} Loan request  Successfully")
+            ->actions([
+                Action::make('view')
+                    ->button()
+                    ->markAsRead()
+                    ->url("loans")
+            ])
+            ->sendToDatabase($user);
+
+        $admins = User::whereHas('roles', fn ($query) => $query->where('name', 'super_admin'))->get();
+        Notification::make()
+            ->title("{$loan->member->name} Requested Loan")
+            ->body("{$loan->member->name} Requested loan for your action sir.")
+            ->actions([
+                Action::make('view')
+                    ->button()
+                    ->markAsRead()
+                    ->url("loans")
+            ])
+            ->sendToDatabase($admins);
     }
 
     /**

@@ -196,11 +196,19 @@ class GrainResource extends Resource
         ];
     }
 
-    public static function getRecordRouteBindingEloquentQuery(): Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+
+        if (auth()->user()->hasRole('Member')) {
+            $memberSlug = auth()->user()->member->slug;
+
+            return $query->where('member_id', $memberSlug);
+        }
+
+        return $query;
     }
 }

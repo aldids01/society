@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use Aldids\FilamentDbSync\FilamentDbSync;
 use App\Filament\Resources\GrainAmorts\Widgets\GrainApproval;
+use App\Filament\Resources\Guarantors\Widgets\GuarantorRequest;
 use App\Filament\Resources\Loans\Widgets\LoanApproval;
 use App\Filament\Resources\Members\Widgets\MemberSavingChart;
 use App\Filament\Resources\Members\Widgets\MemberStatus;
@@ -58,7 +59,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-//            ->strictAuthorization()
+            ->strictAuthorization()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
@@ -66,12 +67,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+//                AccountWidget::class,
+//                FilamentInfoWidget::class,
                 MemberReportStats::class,
                 MemberStatus::class,
                 LoanApproval::class,
                 GrainApproval::class,
+                GuarantorRequest::class,
                 SavingChart::class,
                 MemberSavingChart::class
             ])
@@ -125,7 +127,7 @@ class AdminPanelProvider extends PanelProvider
                         'default' => 1,
                         'sm' => 2,
                     ]),
-                FilamentDbSync::make(),
+//                FilamentDbSync::make(),
                 ApiServicePlugin::make(),
                 BreezyCore::make()
                     ->enableBrowserSessions(condition: true)

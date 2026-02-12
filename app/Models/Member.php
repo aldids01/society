@@ -15,41 +15,12 @@ use Rupadana\ApiService\Contracts\HasAllowedSorts;
 
 class Member extends Model implements HasAllowedFields, HasAllowedSorts, HasAllowedFilters
 {
-    /** @use HasFactory<MemberFactory> */
-    use HasFactory, SoftDeletes;
+
+    use SoftDeletes;
 
     protected $guarded = [];
 // Which fields can be selected from the database through the query string
-    public static function getAllowedFields(): array
-    {
-        return [
-            'slug',
-            'name',
-            'gender',
-            'phone',
-            'kin_name',
-            'kin_phone',
-            'saving',
-            'status'
-        ];
-    }
 
-    // Which fields can be used to sort the results through the query string
-    public static function getAllowedSorts(): array
-    {
-        return [
-            'name'
-        ];
-    }
-
-    // Which fields can be used to filter the results through the query string
-    public static function getAllowedFilters(): array
-    {
-       return [
-           'slug',
-           'name',
-       ];
-    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -91,5 +62,36 @@ class Member extends Model implements HasAllowedFields, HasAllowedSorts, HasAllo
     public function disbursedby(): HasMany
     {
         return $this->hasMany(LoanApproval::Class, 'disbursedby', 'slug');
+    }
+
+    public static function getAllowedFields(): array
+    {
+        return [
+            'slug' => 'slug',
+            'name' => 'name',
+            'gender' => 'gender',
+            'phone' => 'phone',
+            'kin_name' => 'kin_name',
+            'kin_phone' => 'kin_phone',
+            'saving' => 'saving',
+            'status' => 'status'
+        ];
+    }
+
+    // Which fields can be used to sort the results through the query string
+    public static function getAllowedSorts(): array
+    {
+        return [
+            'name'
+        ];
+    }
+
+    // Which fields can be used to filter the results through the query string
+    public static function getAllowedFilters(): array
+    {
+        return [
+            'slug' => 'slug',
+            'name' => 'name',
+        ];
     }
 }

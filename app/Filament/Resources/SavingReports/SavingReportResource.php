@@ -121,8 +121,8 @@ class SavingReportResource extends Resource
                     ->options(fn (): array => Member::query()->where('status', '=', 'active')->pluck('name', 'slug')->all())
             ] , layout: FiltersLayout::AboveContent)
             ->defaultGroup('member.name')
-            ->filtersFormColumns(3)
             ->groupsOnly()
+            ->filtersFormColumns(3)
             ->deselectAllRecordsWhenFiltered(false)
             ->hiddenFilterIndicators()
             ->filtersResetActionPosition(FiltersResetActionPosition::Footer)
@@ -153,6 +153,10 @@ class SavingReportResource extends Resource
         ];
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->hasRole('super_admin');
+    }
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
         return parent::getRecordRouteBindingEloquentQuery()

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Roles;
 
+use App\Models\User;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Filament\Resources\Roles\Pages\CreateRole;
 use App\Filament\Resources\Roles\Pages\EditRole;
@@ -12,12 +13,15 @@ use App\Filament\Resources\Roles\Pages\ViewRole;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
 use BezhanSalleh\PluginEssentials\Concerns\Resource as Essentials;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Panel;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -60,6 +64,7 @@ class RoleResource extends Resource
                                 TextInput::make('guard_name')
                                     ->label(__('filament-shield::filament-shield.field.guard_name'))
                                     ->default(Utils::getFilamentAuthGuard())
+                                    ->readOnly()
                                     ->nullable()
                                     ->maxLength(255),
 
@@ -120,6 +125,36 @@ class RoleResource extends Resource
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
+                Action::make('users')
+                    ->icon('heroicon-o-users')
+                    ->slideOver()
+                    ->requiresConfirmation()
+                    ->fillForm(fn($record): array => [
+                        'users' => $record->users->pluck('id')->toArray()
+                    ])
+                    ->form([
+                        CheckboxList::make('users')
+                            ->options(User::query()->pluck('name', 'id')->toArray())
+                            ->columns(2)
+                            ->searchable()->bulkToggleable()
+                    ])->action(function ($record, array $data) {
+
+                        if (!empty($data['users'])) { // Ensure the 'users' key is populated
+                            // Sync the selected users with the record
+                            $record->users()->sync($data['users']);
+
+                            Notification::make()
+                                ->title('Users successfully synced to the role.')
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('No users were selected.')
+                                ->warning()
+                                ->send();
+                        }
+
+                    })
             ])
             ->toolbarActions([
                 DeleteBulkAction::make(),

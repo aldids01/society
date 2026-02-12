@@ -1,13 +1,13 @@
 <?php
-namespace App\Filament\Resources\Members\Api\Transformers;
+namespace App\Filament\Resources\Guarantors\Api\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\Member;
+use App\Models\Guarantor;
 
 /**
- * @property Member $resource
+ * @property Guarantor $resource
  */
-class MemberTransformer extends JsonResource
+class GuarantorTransformer extends JsonResource
 {
 
     /**
@@ -18,6 +18,6 @@ class MemberTransformer extends JsonResource
      */
     public function toArray($request)
     {
-        return $this->resource->only(Member::getAllowedFields());
+        return $this->resource->toArray();
     }
 }

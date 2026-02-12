@@ -1,15 +1,15 @@
 <?php
-namespace App\Filament\Resources\Members\Api\Handlers;
+namespace App\Filament\Resources\Guarantors\Api\Handlers;
 
 use Illuminate\Http\Request;
 use Rupadana\ApiService\Http\Handlers;
-use App\Filament\Resources\Members\MemberResource;
-use App\Filament\Resources\Members\Api\Requests\CreateMemberRequest;
+use App\Filament\Resources\Guarantors\GuarantorResource;
+use App\Filament\Resources\Guarantors\Api\Requests\CreateGuarantorRequest;
 
 class CreateHandler extends Handlers {
     public static string | null $uri = '/';
-    public static string | null $resource = MemberResource::class;
-    protected static string $permission = 'Create:Member';
+    public static string | null $resource = GuarantorResource::class;
+    protected static string $permission = 'Create:Guarantor';
 
     public static function getMethod()
     {
@@ -21,12 +21,12 @@ class CreateHandler extends Handlers {
     }
 
     /**
-     * Create Member
+     * Create Guarantor
      *
-     * @param CreateMemberRequest $request
+     * @param CreateGuarantorRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function handler(CreateMemberRequest $request)
+    public function handler(CreateGuarantorRequest $request)
     {
         $model = new (static::getModel());
 

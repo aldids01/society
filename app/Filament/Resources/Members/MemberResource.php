@@ -20,11 +20,15 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
@@ -37,6 +41,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Repeater\TableColumn;
 use UnitEnum;
 
 class MemberResource extends Resource
@@ -174,15 +179,12 @@ class MemberResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()
                         ->slideOver()
-                        ->modalWidth(Width::Medium)
-                        ->button()->size(Size::ExtraSmall),
-                    DeleteAction::make()
-                        ->button()->size(Size::ExtraSmall),
-                    ForceDeleteAction::make()
-                        ->button()->size(Size::ExtraSmall),
+                        ->modalWidth(Width::Medium),
+                    DeleteAction::make(),
+                    ForceDeleteAction::make(),
                     Action::make('activate')
-                        ->button()->size(Size::ExtraSmall)
                         ->requiresConfirmation()
+                        ->icon(Heroicon::CheckBadge)
                         ->action(function (Member $member) {
                             $member->update(['status' => 'active']);
 
@@ -193,8 +195,8 @@ class MemberResource extends Resource
                         })
                         ->visible(fn($record) => $record->status == 'inactive' || $record->status == 'withdrawn'),
                     Action::make('deactivate')
-                        ->button()->size(Size::ExtraSmall)
                         ->requiresConfirmation()
+                        ->icon(Heroicon::OutlinedXCircle)
                         ->action(function (Member $member) {
                             $member->update(['status' => 'inactive']);
 
@@ -205,7 +207,6 @@ class MemberResource extends Resource
                         })
                         ->visible(fn($record) => $record->status == 'active'),
                     Action::make('withdraw')
-                        ->button()->size(Size::ExtraSmall)
                         ->requiresConfirmation()
                         ->schema([
                             TextInput::make('saving')
@@ -249,10 +250,53 @@ class MemberResource extends Resource
                         ->icon('heroicon-s-x-circle')
                         ->slideOver()
                         ->visible(fn($record) => $record->status == 'active'),
-                    Action::make('saving')
-                        ->button()->size(Size::ExtraSmall)
-                        ->color('info')
-//                    ->url(fn($record) => route('member.saving', ['member' => $record->slug ])),
+                    Action::make('viewSavings')
+                        ->mountUsing(fn (Schema $form, $record) => $form->fill([
+                            // This automatically maps the 'savings' relationship to the repeater
+                            'savings' => $record->savings->toArray(),
+                        ]))
+                        ->slideOver()
+                        ->modalHeading(fn ($record) => $record->name.' Total saving: ' . number_format($record->savings->sum('total'), 2))
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel('Close')
+                        ->schema([
+                            RepeatableEntry::make('savings')
+                                ->grid(4)
+                                ->schema([
+                                    TextEntry::make('annual')->hiddenLabel(),
+                                    ...array_map(fn ($month) =>
+                                    TextEntry::make($month)->numeric(),
+                                        ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'total']
+                                    )
+                                ])
+                        ]),
+                    Action::make('savingUpdate')
+                        ->icon(Heroicon::BuildingLibrary)
+                        ->mountUsing(fn (Schema $form, $record) => $form->fill([
+                            // This automatically maps the 'savings' relationship to the repeater
+                            'savings' => $record->savings->toArray(),
+                        ]))
+                        ->slideOver()
+                        ->schema([
+                            Repeater::make('savings')
+                                ->relationship('savings')
+                                ->collapsed()
+                                ->grid(3)
+                                ->schema([
+                                    TextInput::make('annual')->numeric(),
+                                    ...array_map(fn ($month) =>
+                                    TextInput::make($month)->numeric(),
+                                        ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                                    )
+                                ])->itemLabel(fn (array $state): ?string => $state['annual'] ?? null)
+                        ])
+                        ->after(function () {
+                            Notification::make()
+                                ->success()
+                                ->title('Update Complete')
+                                ->body('Monthly records have been reconciled.')
+                                ->send();
+                        })
                 ])->button()->size(Size::ExtraSmall)
             ])
             ->toolbarActions([

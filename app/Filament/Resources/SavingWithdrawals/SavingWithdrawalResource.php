@@ -96,7 +96,6 @@ class SavingWithdrawalResource extends Resource
         return $table
             ->paginated([10, 25, 50, 100, 'all'])
             ->deferLoading(true)
-            ->query(fn (): Builder => Loan::query()->where('rate', '<', 6))
             ->columns([
                 TextColumn::make('member.name')
                     ->searchable(),
@@ -163,11 +162,20 @@ class SavingWithdrawalResource extends Resource
         ];
     }
 
-    public static function getRecordRouteBindingEloquentQuery(): Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('rate', '<', 6);
+
+        if (auth()->user()->hasRole('Member')) {
+            $memberSlug = auth()->user()->member->slug;
+
+            return $query->where('member_id', $memberSlug);
+        }
+
+        return $query;
     }
 }

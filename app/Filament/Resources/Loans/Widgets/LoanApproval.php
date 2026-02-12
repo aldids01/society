@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Loans\Widgets;
 use App\Filament\Resources\Loans\LoanResource;
 use App\Models\Loan;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
@@ -30,14 +31,7 @@ class LoanApproval extends TableWidget
             ->deferLoading(true)
             ->query(fn (): Builder => Loan::query()->where('status', '!=','disbursed'))
             ->columns([
-                TextColumn::make('member.name')
-                    ->searchable(),
-                TextColumn::make('guarantor_type')
-                    ->formatStateUsing(fn(string $state): string => ucfirst($state))
-                    ->badge(),
-                TextColumn::make('saved')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('member.name'),
                 TextColumn::make('rate')
                     ->numeric()
                     ->sortable(),
@@ -123,7 +117,20 @@ class LoanApproval extends TableWidget
                                 if ($nextStatus) {
                                     $record->update(['status' => $nextStatus]);
                                 }
+
+                                $user = $record->member->user;
+                                Notification::make()
+                                    ->title("Loan $nextStatus")
+                                    ->body("Your loan request have been successfully $nextStatus")
+                                    ->actions([
+                                        Action::make('view')
+                                            ->button()
+                                            ->markAsRead()
+                                            ->url("loans")
+                                    ])
+                                    ->sendToDatabase($user);
                             }
+
 
                             Notification::make()
                                 ->title('Approved')

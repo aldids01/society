@@ -181,14 +181,21 @@ class LoanResource extends Resource
                     ->placeholder('This loan does not require a guarantor.')
                     ->table([
                         TableColumn::make('Name')
-                            ->width('70%'),
+                            ->width('40%'),
                         TableColumn::make('Amount')
+                            ->width('30%')
+                            ->alignEnd(),
+                        TableColumn::make('Status')
                             ->width('30%')
                             ->alignEnd(),
                     ])
                     ->schema([
                         TextEntry::make('member.name') ->alignStart(),
                         TextEntry::make('amount') ->numeric()->alignEnd(),
+                        TextEntry::make('status')
+                            ->formatStateUsing(fn ($state) => ucfirst($state))
+                            ->badge()
+                            ->alignEnd(),
                     ]),
             ])->columns(1);
     }
@@ -199,7 +206,6 @@ class LoanResource extends Resource
             ->recordTitleAttribute('name')
             ->paginated([10, 25, 50, 100, 'all'])
             ->deferLoading(true)
-            ->query(fn (): Builder => Loan::query()->where('rate', '>=', 6))
             ->columns([
                 TextColumn::make('member.name')
                     ->searchable(),
@@ -270,12 +276,21 @@ class LoanResource extends Resource
         ];
     }
 
-    public static function getRecordRouteBindingEloquentQuery(): Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('rate', '>=', 6);
+
+        if (auth()->user()->hasRole('Member')) {
+            $memberSlug = auth()->user()->member->slug;
+
+            return $query->where('member_id', $memberSlug);
+        }
+
+        return $query;
     }
 
     protected static function calculateRate($amount, $savings): int

@@ -1,13 +1,13 @@
 <?php
-namespace App\Filament\Resources\Members\Api;
+namespace App\Filament\Resources\Guarantors\Api;
 
 use Rupadana\ApiService\ApiService;
-use App\Filament\Resources\Members\MemberResource;
+use App\Filament\Resources\Guarantors\GuarantorResource;
 
 
-class MemberApiService extends ApiService
+class GuarantorApiService extends ApiService
 {
-    protected static string | null $resource = MemberResource::class;
+    protected static string | null $resource = GuarantorResource::class;
 
     public static function handlers() : array
     {

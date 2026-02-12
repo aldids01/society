@@ -11,7 +11,7 @@ use App\Filament\Resources\Savings\Api\Transformers\SavingTransformer;
 
 class DetailHandler extends Handlers
 {
-    public static string | null $uri = '/{id}';
+    public static string | null $uri = '/{slug}';
     public static string | null $resource = SavingResource::class;
     protected static string $permission = 'View:Saving';
 
@@ -24,12 +24,12 @@ class DetailHandler extends Handlers
      */
     public function handler(Request $request)
     {
-        $id = $request->route('id');
-        
+        $id = $request->route('slug');
+
         $query = static::getEloquentQuery();
 
         $query = QueryBuilder::for(
-            $query->where(static::getKeyName(), $id)
+            $query->where('slug', '=', $id)
         )
             ->first();
 

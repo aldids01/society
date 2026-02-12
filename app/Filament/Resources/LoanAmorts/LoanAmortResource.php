@@ -155,6 +155,7 @@ class LoanAmortResource extends Resource
                 SelectFilter::make('member_id')
                     ->label('Member')
                     ->searchable()
+                    ->visible(auth()->user()->hasRole('super_admin'))
                     ->options(fn (): array => Member::query()->where('status', '=', 'active')->pluck('name', 'slug')->all())
 
             ], layout: FiltersLayout::AboveContent)
@@ -261,7 +262,7 @@ class LoanAmortResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn($record) => $record->status !== 'paid')
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin'))
                         ->slideOver(),
                     Action::make('payment')
                         ->label('Extra Payment')
@@ -365,7 +366,7 @@ class LoanAmortResource extends Resource
                                 ->body('Extra payment successfully applied to this loan')
                                 ->send();
                         })
-                        ->visible(fn($record) => $record->status !== 'paid' )
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin'))
                         ->slideOver(),
                     Action::make('stop')
                         ->label('Stop Loan')
@@ -384,7 +385,7 @@ class LoanAmortResource extends Resource
                         })
                         ->icon('heroicon-m-x-circle')
                         ->modalIcon('heroicon-m-x-circle')
-                        ->visible(fn($record) => $record->status !== 'paid'),
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin')),
                     Action::make('savings')
                         ->label('Saving Payout')
                         ->modalFooterActionsAlignment(Alignment::Center)
@@ -501,7 +502,7 @@ class LoanAmortResource extends Resource
                         ->icon('heroicon-m-banknotes')
                         ->modalIcon('heroicon-m-banknotes')
                         ->modalDescription('Saving Payout are using your total saving to reduce or pay off your pending loan. Are you sure you want to do this?')
-                        ->visible(fn($record) => $record->status !== 'paid')
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin'))
                         ->slideOver(),
                     Action::make('transfer')
                         ->label('Transfer Loan')
@@ -533,7 +534,7 @@ class LoanAmortResource extends Resource
                         })
                         ->icon('heroicon-m-arrow-right-circle')
                         ->modalIcon('heroicon-m-arrow-right-circle')
-                        ->visible(fn($record) => $record->status !== 'paid')
+                        ->visible(fn($record) => $record->status !== 'paid' && auth()->user()->hasRole('super_admin'))
                         ->slideOver(),
                 ])->button()->size(Size::Small)
 
@@ -552,6 +553,7 @@ class LoanAmortResource extends Resource
                         ->modalFooterActionsAlignment(Alignment::Center)
                         ->modalWidth(Width::ExtraSmall)
                         ->modalCancelAction(false)
+                        ->visible(auth()->user()->hasRole('super_admin'))
                         ->label('Mark as Paid')
                         ->action(function(Collection $records): void {
                             $records->each(function($record): void {
@@ -573,6 +575,7 @@ class LoanAmortResource extends Resource
                         ->color('primary')
                         ->modalDescription('Are you sure you want to do this?')
                         ->modalCancelAction(false)
+                        ->visible(auth()->user()->hasRole('super_admin'))
                         ->label('Mark as Pending')
                         ->action(function(Collection $records): void {
                             $records->each(function($record): void {
@@ -592,6 +595,7 @@ class LoanAmortResource extends Resource
                         ->modal()
                         ->modalFooterActionsAlignment(Alignment::Center)
                         ->color('danger')
+                        ->visible(auth()->user()->hasRole('super_admin'))
                         ->modalCancelAction(false)
                         ->label('Mark as Overdue')
                         ->modalDescription('Are you sure you want to do this?')
@@ -617,11 +621,19 @@ class LoanAmortResource extends Resource
         ];
     }
 
-    public static function getRecordRouteBindingEloquentQuery(): Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+
+        if (auth()->user()->hasRole('Member')) {
+            $memberSlug = auth()->user()->member->slug;
+
+            return $query->where('member_id', $memberSlug);
+        }
+
+        return $query;
     }
 }

@@ -1,15 +1,15 @@
 <?php
-namespace App\Filament\Resources\Members\Api\Handlers;
+namespace App\Filament\Resources\Guarantors\Api\Handlers;
 
 use Illuminate\Http\Request;
 use Rupadana\ApiService\Http\Handlers;
-use App\Filament\Resources\Members\MemberResource;
-use App\Filament\Resources\Members\Api\Requests\UpdateMemberRequest;
+use App\Filament\Resources\Guarantors\GuarantorResource;
+use App\Filament\Resources\Guarantors\Api\Requests\UpdateGuarantorRequest;
 
 class UpdateHandler extends Handlers {
     public static string | null $uri = '/{id}';
-    public static string | null $resource = MemberResource::class;
-    protected static string $permission = 'Update:Member';
+    public static string | null $resource = GuarantorResource::class;
+    protected static string $permission = 'Update:Guarantor';
 
     public static function getMethod()
     {
@@ -22,12 +22,12 @@ class UpdateHandler extends Handlers {
 
 
     /**
-     * Update Member
+     * Update Guarantor
      *
-     * @param UpdateMemberRequest $request
+     * @param UpdateGuarantorRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function handler(UpdateMemberRequest $request)
+    public function handler(UpdateGuarantorRequest $request)
     {
         $id = $request->route('id');
 

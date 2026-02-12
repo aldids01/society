@@ -5,7 +5,10 @@ namespace App\Observers;
 use App\Models\Grain;
 use App\Models\GrainAmort;
 use App\Models\GrainApproval;
+use App\Models\User;
 use Carbon\Carbon;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 
 class GrainObserver
 {
@@ -96,5 +99,29 @@ class GrainObserver
 
             $remainingBalance = $endBalance;
         }
+
+        $user = $grain->member->user;
+        Notification::make()
+            ->title('Grain Request Successful')
+            ->body("{$grain->member->name} Grain request  Successfully")
+            ->actions([
+                Action::make('view')
+                    ->button()
+                    ->markAsRead()
+                    ->url("loans")
+            ])
+            ->sendToDatabase($user);
+
+        $admins = User::whereHas('roles', fn ($query) => $query->where('name', 'super_admin'))->get();
+        Notification::make()
+            ->title("{$grain->member->name} Requested Grain")
+            ->body("{$grain->member->name} Requested grain for your action sir.")
+            ->actions([
+                Action::make('view')
+                    ->button()
+                    ->markAsRead()
+                    ->url("loans")
+            ])
+            ->sendToDatabase($admins);
     }
 }

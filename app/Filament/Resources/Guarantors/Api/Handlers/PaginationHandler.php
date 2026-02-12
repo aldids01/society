@@ -1,20 +1,20 @@
 <?php
-namespace App\Filament\Resources\Members\Api\Handlers;
+namespace App\Filament\Resources\Guarantors\Api\Handlers;
 
 use Illuminate\Http\Request;
 use Rupadana\ApiService\Http\Handlers;
 use Spatie\QueryBuilder\QueryBuilder;
-use App\Filament\Resources\Members\MemberResource;
-use App\Filament\Resources\Members\Api\Transformers\MemberTransformer;
+use App\Filament\Resources\Guarantors\GuarantorResource;
+use App\Filament\Resources\Guarantors\Api\Transformers\GuarantorTransformer;
 
 class PaginationHandler extends Handlers {
     public static string | null $uri = '/';
-    public static string | null $resource = MemberResource::class;
-    protected static string $permission = 'ViewAny:Member';
+    public static string | null $resource = GuarantorResource::class;
+    protected static string $permission = 'ViewAny:Guarantor';
 
 
     /**
-     * List of Member
+     * List of Guarantor
      *
      * @param Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
@@ -31,6 +31,6 @@ class PaginationHandler extends Handlers {
         ->paginate(request()->query('per_page'))
         ->appends(request()->query());
 
-        return MemberTransformer::collection($query);
+        return GuarantorTransformer::collection($query);
     }
 }
