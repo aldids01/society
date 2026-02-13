@@ -98,7 +98,6 @@ class SavingResource extends Resource
             ->heading(fn()=> 'Total Saving: ' .Number::format($total, 2).'  ('.ucwords(Number::spell($total)).')')
             ->defaultPaginationPageOption(25)
             ->deferLoading(true)
-            ->query(fn (): Builder => Saving::query()->where('member_id', '=', auth()->user()->member->slug))
             ->paginated([10, 25, 50, 100, 'all'])
             ->columns([
                 TextColumn::make('annual'),
@@ -185,11 +184,12 @@ class SavingResource extends Resource
         ];
     }
 
-    public static function getRecordRouteBindingEloquentQuery(): Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
+        return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('member_id', '=', auth()->user()->member->slug);
     }
 }

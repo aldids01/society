@@ -21,6 +21,7 @@ class QuarterlySaving extends StatsOverviewWidget
     protected function getStats(): array
     {
         $sums = $this->getPageTableQuery()
+            ->reorder()
             ->selectRaw('
             SUM(January + February + March) as q1,
             SUM(April + May + June) as q2,
