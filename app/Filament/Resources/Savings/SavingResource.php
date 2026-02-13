@@ -21,6 +21,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -103,42 +104,55 @@ class SavingResource extends Resource
                 TextColumn::make('annual'),
                 TextColumn::make('January')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('February')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('March')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('April')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('May')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('June')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('July')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('August')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('September')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('October')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('November')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('December')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('total')
                     ->numeric()
+                    ->summarize(Sum::make()->label(''))
                     ->sortable(),
                 TextColumn::make('status')
                     ->formatStateUsing(fn ($state) => ucfirst($state))

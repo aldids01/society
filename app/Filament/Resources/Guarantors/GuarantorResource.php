@@ -116,6 +116,8 @@ class GuarantorResource extends Resource
                     ->modalWidth(Width::Medium)
                     ->slideOver(),
                 Action::make('authorize')
+                    ->requiresConfirmation()
+                    ->visible(fn($record) => $record->status !== 'approved')
                     ->action(function ($record) {
                         $record->update(['status' => 'approved']);
 
