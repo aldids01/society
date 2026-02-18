@@ -25,8 +25,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -127,15 +125,13 @@ class AdminPanelProvider extends PanelProvider
                         'default' => 1,
                         'sm' => 2,
                     ]),
-//                FilamentDbSync::make(),
                 ApiServicePlugin::make(),
                 BreezyCore::make()
-                    ->enableBrowserSessions(condition: true)
+                    ->enableBrowserSessions()
                     ->myProfile(
                         // Sets the 'account' link in the panel User Menu (default = true)
                         shouldRegisterNavigation: true, // Customizes the 'account' link label in the panel User Menu (default = null)
-                        hasAvatars: false, // Adds a main navigation item for the My Profile page (default = false)
-                        slug: 'my-profile', // Sets the navigation group for the My Profile page (default = null)
+                        // Sets the navigation group for the My Profile page (default = null)
                         navigationGroup: 'Settings', // Enables the avatar upload form component (default = false)
                         userMenuLabel: 'My Profile' // Sets the slug for the profile page (default = 'my-profile')
                     ),

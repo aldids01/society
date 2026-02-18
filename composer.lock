@@ -4,95 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "07d049cbb53c6c92485d08dc5011a853",
+    "content-hash": "7ca897d51aa68888f1e4b8e56b2b817d",
     "packages": [
-        {
-            "name": "aldids/filament-db-sync",
-            "version": "2.x-dev",
-            "dist": {
-                "type": "path",
-                "url": "packages/dbsync",
-                "reference": "b8aab6dae19dff3de0905e1ce13add5adb05671e"
-            },
-            "require": {
-                "filament/filament": "^4.0",
-                "php": "^8.2",
-                "spatie/laravel-package-tools": "^1.16"
-            },
-            "require-dev": {
-                "laravel/pint": "^1.27",
-                "nunomaduro/collision": "^8.8",
-                "nunomaduro/larastan": "^3.9",
-                "orchestra/testbench": "^10.0",
-                "pestphp/pest": "^4.3",
-                "pestphp/pest-plugin-arch": "^4.0",
-                "pestphp/pest-plugin-laravel": "^4.0",
-                "phpstan/extension-installer": "^1.4",
-                "phpstan/phpstan-deprecation-rules": "^2.0",
-                "phpstan/phpstan-phpunit": "^2.0",
-                "spatie/laravel-ray": "^1.43"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "aldids\\FilamentDbSync\\FilamentDbSyncServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "aldids\\FilamentDbSync\\": "src/",
-                    "aldids\\FilamentDbSync\\Database\\Factories\\": "database/factories/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "aldids\\FilamentDbSync\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "post-autoload-dump": [
-                    "@php ./vendor/bin/testbench package:discover --ansi"
-                ],
-                "analyse": [
-                    "vendor/bin/phpstan analyse"
-                ],
-                "test": [
-                    "vendor/bin/pest"
-                ],
-                "test-coverage": [
-                    "vendor/bin/pest --coverage"
-                ],
-                "format": [
-                    "vendor/bin/pint"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nchandom Alpha Elias",
-                    "email": "nchandoms@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "This package allow sync two different laravel filament app db",
-            "homepage": "https://github.com/aldids/filament-db-sync",
-            "keywords": [
-                "aldids",
-                "filament-db-sync",
-                "laravel"
-            ],
-            "support": {
-                "issues": "https://github.com/aldids/filament-db-sync/issues",
-                "source": "https://github.com/aldids/filament-db-sync"
-            },
-            "transport-options": {
-                "relative": true
-            }
-        },
         {
             "name": "anourvalar/eloquent-serialize",
             "version": "1.3.5",
@@ -12594,9 +12507,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "aldids/filament-db-sync": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
